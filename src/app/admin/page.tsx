@@ -681,7 +681,7 @@ export default function AdminPage() {
       )}
 
       {/* ===================== MAIN CONTENT WRAPPER ===================== */}
-      <div className="flex flex-1 flex-col overflow-hidden">
+      <div className="flex flex-1 flex-col overflow-hidden min-w-0">
         {/* Top Header */}
         <header className="flex h-16 items-center justify-between border-b border-slate-200 bg-white px-4 sm:px-6 z-10 shadow-xs">
           <div className="flex items-center gap-3">
@@ -780,7 +780,7 @@ export default function AdminPage() {
         )}
 
         {/* Main Content Area */}
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 custom-scrollbar">
+        <main className="flex-1 overflow-y-auto overflow-x-hidden min-w-0 p-4 sm:p-6 lg:p-8 custom-scrollbar">
           {/* ==================== TAB: DASHBOARD (MATCHING SCREENSHOT) ==================== */}
           {activeTab === 'dashboard' && (
             <div className="space-y-6">
@@ -1028,8 +1028,8 @@ export default function AdminPage() {
               </div>
 
               {/* EARNING AND COMMISSION DUAL-BAR CHART */}
-              <div className="rounded-3xl border border-slate-200/80 bg-white p-6 shadow-xs">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+              <div className="rounded-3xl border border-slate-200/80 bg-white p-4 sm:p-6 shadow-xs overflow-hidden">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4 sm:mb-6">
                   <div>
                     <h2 className="text-base font-black text-slate-900 tracking-tight">
                       Earning and Commission
@@ -1039,88 +1039,106 @@ export default function AdminPage() {
                     </p>
                   </div>
 
-                  <div className="flex items-center gap-6 text-xs font-semibold">
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-semibold">
                     <div className="flex items-center gap-2">
-                      <span className="h-3 w-3 rounded-full bg-[#2563eb]" />
+                      <span className="h-3 w-3 rounded-full bg-[#2563eb] shrink-0" />
                       <span className="text-slate-700">Total earning $ 2,968.90</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="h-3 w-3 rounded-full bg-[#93c5fd]" />
+                      <span className="h-3 w-3 rounded-full bg-[#93c5fd] shrink-0" />
                       <span className="text-slate-500">Commission given $ 390.66</span>
                     </div>
                   </div>
                 </div>
 
-                {/* Tooltip Card if hovering */}
-                <div className="h-5 text-xs font-semibold text-slate-600 mb-1">
-                  {hoveredBar ? (
-                    <span className="inline-flex items-center gap-2 bg-slate-100 rounded-lg px-2.5 py-0.5 text-[11px]">
-                      <span>Day {hoveredBar.day}:</span>
-                      <strong className="text-blue-600">Earning ${hoveredBar.earn}</strong>
-                      <span className="text-slate-400">•</span>
-                      <span className="text-sky-500">Commission ${hoveredBar.comm}</span>
-                    </span>
-                  ) : (
-                    <span className="text-slate-400 text-[11px]">Hover over any day bar for breakdown</span>
-                  )}
+                {/* Tooltip Card if hovering or tapping */}
+                <div className="flex items-center justify-between min-h-[26px] text-xs font-semibold text-slate-600 mb-2">
+                  <div>
+                    {hoveredBar ? (
+                      <span className="inline-flex items-center gap-2 bg-slate-100 rounded-lg px-2.5 py-1 text-[11px]">
+                        <span>Day {hoveredBar.day}:</span>
+                        <strong className="text-blue-600">Earning ${hoveredBar.earn}</strong>
+                        <span className="text-slate-400">•</span>
+                        <span className="text-sky-500">Commission ${hoveredBar.comm}</span>
+                      </span>
+                    ) : (
+                      <span className="text-slate-400 text-[11px]">Tap or hover bar for breakdown</span>
+                    )}
+                  </div>
+                  <span className="md:hidden text-[10px] text-slate-400 font-medium bg-slate-50 px-2 py-0.5 rounded-md border border-slate-200/60">
+                    Scroll ↔
+                  </span>
                 </div>
 
                 {/* SVG / CSS Bar Chart */}
-                <div className="relative pt-4">
-                  {/* Grid Lines */}
-                  <div className="absolute inset-0 flex flex-col justify-between pointer-events-none pb-7 text-[10px] text-slate-400">
-                    <div className="border-b border-dashed border-slate-100 w-full flex justify-between">
+                <div className="relative pt-2">
+                  <div className="flex">
+                    {/* Fixed Y-Axis Labels on Left */}
+                    <div className="flex flex-col justify-between pb-7 pr-2.5 text-[10px] text-slate-400 font-medium select-none shrink-0 h-48">
                       <span>3000</span>
-                    </div>
-                    <div className="border-b border-dashed border-slate-100 w-full flex justify-between">
                       <span>2000</span>
-                    </div>
-                    <div className="border-b border-dashed border-slate-100 w-full flex justify-between">
                       <span>1000</span>
-                    </div>
-                    <div className="border-b border-slate-200 w-full flex justify-between">
                       <span>0</span>
                     </div>
-                  </div>
 
-                  {/* Bars Container */}
-                  <div className="relative flex items-end justify-between h-48 pl-6 pr-2 pt-4">
-                    {chartDays.map((item) => {
-                      const earnHeightPercent = Math.min(100, Math.max(10, (item.earn / 3000) * 100));
-                      const commHeightPercent = Math.min(100, Math.max(5, (item.comm / 3000) * 100));
-                      const isHovered = hoveredBar?.day === item.day;
-
-                      return (
-                        <div
-                          key={item.day}
-                          onMouseEnter={() => setHoveredBar(item)}
-                          onMouseLeave={() => setHoveredBar(null)}
-                          className="group relative flex flex-col items-center justify-end h-full flex-1 cursor-pointer mx-0.5"
-                        >
-                          <div className="flex items-end gap-[2px] w-full justify-center">
-                            {/* Blue Earning Bar */}
-                            <div
-                              style={{ height: `${earnHeightPercent}%` }}
-                              className={`w-1.5 sm:w-2 rounded-t-sm transition-all duration-200 ${
-                                isHovered ? 'bg-blue-700 scale-y-105' : 'bg-[#2563eb]'
-                              }`}
-                            />
-                            {/* Light Blue Commission Bar */}
-                            <div
-                              style={{ height: `${commHeightPercent}%` }}
-                              className={`w-1 sm:w-1.5 rounded-t-sm transition-all duration-200 ${
-                                isHovered ? 'bg-sky-400 scale-y-105' : 'bg-[#93c5fd]'
-                              }`}
-                            />
-                          </div>
-
-                          {/* Day label */}
-                          <span className="text-[10px] text-slate-400 mt-2 block group-hover:text-slate-900 group-hover:font-bold">
-                            {item.day}
-                          </span>
+                    {/* Scrollable Chart Area (Mobile swipeable, Desktop full-width) */}
+                    <div className="flex-1 overflow-x-auto overflow-y-hidden custom-scrollbar pb-2">
+                      <div className="relative min-w-[620px] md:min-w-full h-48">
+                        {/* Horizontal Grid Lines */}
+                        <div className="absolute inset-0 flex flex-col justify-between pointer-events-none pb-7">
+                          <div className="border-b border-dashed border-slate-100 w-full" />
+                          <div className="border-b border-dashed border-slate-100 w-full" />
+                          <div className="border-b border-dashed border-slate-100 w-full" />
+                          <div className="border-b border-slate-200 w-full" />
                         </div>
-                      );
-                    })}
+
+                        {/* Bars Container */}
+                        <div className="relative flex items-end justify-between h-full pr-1">
+                          {chartDays.map((item) => {
+                            const earnHeightPercent = Math.min(100, Math.max(10, (item.earn / 3000) * 100));
+                            const commHeightPercent = Math.min(100, Math.max(5, (item.comm / 3000) * 100));
+                            const isHovered = hoveredBar?.day === item.day;
+
+                            return (
+                              <div
+                                key={item.day}
+                                onMouseEnter={() => setHoveredBar(item)}
+                                onMouseLeave={() => setHoveredBar(null)}
+                                onClick={() => setHoveredBar(isHovered ? null : item)}
+                                className="group relative flex flex-col items-center justify-end h-full flex-1 cursor-pointer mx-0.5 pb-0"
+                              >
+                                {/* Dual Bars */}
+                                <div className="flex items-end gap-[2px] w-full justify-center h-[calc(100%-1.75rem)] pb-0">
+                                  {/* Blue Earning Bar */}
+                                  <div
+                                    style={{ height: `${earnHeightPercent}%` }}
+                                    className={`w-1.5 sm:w-2 rounded-t-sm transition-all duration-200 ${
+                                      isHovered ? 'bg-blue-700 scale-y-105' : 'bg-[#2563eb]'
+                                    }`}
+                                  />
+                                  {/* Light Blue Commission Bar */}
+                                  <div
+                                    style={{ height: `${commHeightPercent}%` }}
+                                    className={`w-1 sm:w-1.5 rounded-t-sm transition-all duration-200 ${
+                                      isHovered ? 'bg-sky-400 scale-y-105' : 'bg-[#93c5fd]'
+                                    }`}
+                                  />
+                                </div>
+
+                                {/* Day label neatly contained below the baseline */}
+                                <span
+                                  className={`text-[10px] h-7 flex items-center justify-center transition-colors select-none ${
+                                    isHovered ? 'text-slate-900 font-bold' : 'text-slate-400'
+                                  }`}
+                                >
+                                  {item.day}
+                                </span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
